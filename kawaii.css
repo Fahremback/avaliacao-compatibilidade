@@ -1,0 +1,80 @@
+/* Strawberry stationery: warm ink, blush paper, lilac and cream stickers. */
+:root { --ink:#593c50; --muted:#795c6e; --blue:#a34670; --line:#efcedc; --bg:#fff1f5; --green:#53745b; }
+body { background-color:#fff1f5; background-image:radial-gradient(circle at 20% 10%,#ffe0e8 0,transparent 42%),radial-gradient(circle at 95% 42%,#f1e3fc 0,transparent 45%),radial-gradient(#e4afc96b 1px,transparent 1px); background-size:auto,auto,19px 19px; }
+.topbar { border-bottom:1px solid #f0d5e1; background:#fff8fa; }
+.brand-mark { background:#f9dfeb; color:#b35c85; box-shadow:0 2px 0 #e9bcd2; }
+.panel { background:#fffdfa; border:1.5px solid #eac4d5; border-radius:30px; box-shadow:0 5px 0 #efcddd,0 15px 35px #a96c951b; }
+.panel::before { border:1px dashed #f2d6e3; inset:7px; }
+.panel::after { content:''; width:53px; height:18px; position:absolute; top:-9px; left:calc(50% - 26px); background:repeating-linear-gradient(45deg,#f7c9d9aa 0 5px,#fff0f4aa 5px 10px); transform:rotate(-4deg); border-radius:2px; pointer-events:none; }
+.panel h1,.panel h2 { font-family:Georgia,'Times New Roman',serif; color:#593c50; letter-spacing:-.04em; }
+.panel h1[tabindex='-1']:focus,.panel h2[tabindex='-1']:focus { outline:none; }
+.panel[data-screen='intro'] h1::before { content:none; }
+.panel[data-screen='intro'] h1,.panel[data-screen='celebration'] h1 { text-align:center; }
+.storybook-art { margin:7px auto 0; width:min(100%,250px); line-height:0; }
+.bunny-art { display:block; width:100%; height:auto; overflow:visible; }
+.panel[data-screen='intro'] .storybook-art { width:min(100%,222px); }
+.panel[data-screen='invitation'] .love-letter { display:none; }
+.panel[data-screen='celebration'] .end-mark.celebration { display:none; }
+.panel[data-screen='invitation'] .storybook-art,.panel[data-screen='celebration'] .storybook-art { animation:storybook-in .65s cubic-bezier(.16,.8,.3,1.15) both; }
+@keyframes storybook-in { from { opacity:0;transform:translateY(9px) scale(.94) rotate(-2deg); } to { opacity:1;transform:none; } }
+.floating-heart { transform-origin:140px 28px; animation:heart-bloom .9s .15s ease-out both; }
+@keyframes heart-bloom { 0% { opacity:0;transform:scale(.4); } 65% { opacity:1;transform:scale(1.15); } 100% { transform:scale(1); } }
+.panel[data-screen='celebration'] .personal-note { text-align:center; font-size:20px!important; }
+.eyebrow { color:#995571; letter-spacing:.075em; }
+.eyebrow::before { content:'✿'; color:#ce8aa8; }
+.intro-meta { gap:10px; }
+.meta { background:#fff1f4; border-color:#f0d4df; border-radius:13px; transform:rotate(-1deg); }
+.meta:last-child { background:#f6effb; border-color:#e8d9f2; transform:rotate(1deg); }
+.meta strong { color:#744a63; }
+.date-input { border:1.5px solid #e9ccdb; background:#fffdfb; }
+.primary { background:#a64a75; border:1px solid #a64a75; border-radius:17px; box-shadow:0 3px 0 #793b5b; color:white; }
+.primary:hover { background:#933e66; }
+.primary:disabled { background:#cdb0bf; border-color:#cdb0bf; box-shadow:0 3px 0 #b69aa9; }
+.primary:active:not(:disabled) { transform:translateY(2px); box-shadow:0 1px 0 #793b5b; }
+.secondary { background:#fff5f7; border:1.5px solid #eac6d6; }
+.option { background:#fff9fa; border:1.5px solid #ecd0de; }
+.option:nth-child(2) { background:#fcf7ff; border-color:#e7d8ef; }
+.option:nth-child(3) { background:#fffaf1; border-color:#efe0c8; }
+.option.selected { background:#f9e4ee; border-color:#bd7296; }
+.option-letter { background:#f7dfe9; color:#8c4d6d; border:none; font-weight:700; }
+.option:nth-child(2) .option-letter { background:#eee0f7; color:#79578c; }
+.option:nth-child(3) .option-letter { background:#f7e9cf; color:#88653a; }
+.option.selected .option-letter { background:#a64a75; color:white; }
+.option.selected::after { content:'✓'; background:#a64a75; border-color:#a64a75; }
+.panel[data-screen='question'] .progress { margin-bottom:6px; }
+.petal-progress { display:flex; justify-content:space-between; align-items:center; margin:3px 0 14px; padding:0 1px; height:24px; }
+.petal-progress span { color:#edd8e0; font-size:17px; line-height:1; }
+.petal-progress .bloomed { color:#ba7297; }
+.petal-progress .blooming { color:#a64a75; font-size:23px; animation:petal-pop .4s ease-out both; }
+@keyframes petal-pop { from { transform:scale(.5) rotate(-20deg); opacity:.4; } to { transform:scale(1); opacity:1; } }
+.feedback { background:#fff0f4; border-color:#f2ccd9; }
+.feedback::before { content:'✿'; }
+.result-top { background:#fff2f6; border:1px dashed #e5b8cc; border-radius:19px; padding:17px; }
+.score { color:#a64a75; }
+.metric-track span { background:linear-gradient(90deg,#d98fae,#c3a0dc); }
+.metric-track .low { background:#d8a46f; }
+.approval { background:#f2f7ef; }
+.idea-option:nth-child(4) { background:#f1f7f2; border-color:#d9e7d9; }
+.idea-option:nth-child(5) { background:#fff3e9; border-color:#efddc8; }
+.idea-option.selected { background:#f9e4ee; border-color:#bd7296; }
+.idea-icon { border:1px solid #eccbdc; box-shadow:0 2px 0 #eccbdc; background:#fff; }
+.date-summary { background:#fff1f6; border-style:dashed; }
+.panel[data-screen='invitation'] .reveal { background:#fff4f7; padding:17px; border:1px dashed #e9b9ce; border-radius:18px; }
+.panel[data-screen='invitation'] .reveal h2 { text-align:center; }
+.panel[data-screen='invitation'] .reveal p { text-align:center; }
+.history-entry { background:#fff7fa; }
+@media(max-width:740px){
+  .workspace{padding-top:20px;}
+  .panel{border-radius:24px;padding:20px 17px;}
+  .panel::before{border-radius:17px;}
+  .storybook-art{width:min(100%,218px);}
+  .panel[data-screen='intro'] .storybook-art{width:min(100%,185px);}
+  .panel h1{font-size:clamp(28px,7.7vw,35px);}
+  .panel[data-screen='intro'] h1{margin-top:4px;}
+  .panel[data-screen='intro'] .intro-meta{margin:17px 0;}
+  .panel[data-screen='invitation'] .reveal{padding:13px;}
+  .result-top{padding:13px;gap:9px;}
+  .panel[data-screen='question'] .options{gap:10px;}
+  .option{min-height:60px;}
+}
+@media(prefers-reduced-motion:reduce){.bunny-art,.floating-heart,.storybook-art,.petal-progress .blooming{animation:none!important;}}

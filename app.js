@@ -77,10 +77,39 @@ function showHistory() {
   bind('new-test', intro);
 }
 
+function bunnyArt(kind) {
+  const romantic = kind === 'invitation' || kind === 'celebration';
+  const bunny = (x, coat, ear, flip = 1) => `<g transform="translate(${x} 0) scale(${flip} 1)" stroke="#9b7186" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <ellipse cx="0" cy="132" rx="37" ry="7" fill="#d9a8ba" opacity=".18" stroke="none"/>
+    <ellipse cx="0" cy="113" rx="28" ry="24" fill="${coat}"/>
+    <ellipse cx="-20" cy="132" rx="14" ry="8" fill="${coat}"/><ellipse cx="20" cy="132" rx="14" ry="8" fill="${coat}"/>
+    <path d="M-23 63 C-42 25 -33 10 -22 15 C-12 20 -9 41 -8 55" fill="${coat}"/>
+    <path d="M15 56 C12 29 19 9 30 13 C44 18 34 47 28 63" fill="${coat}"/>
+    <path d="M-25 24 Q-28 39 -17 53 M29 23 Q24 35 23 49" fill="none" stroke="${ear}" stroke-width="6"/>
+    <path d="M-39 79 C-39 54 -19 49 0 51 C23 49 39 63 39 82 C39 104 20 111 0 111 C-24 111 -39 102 -39 79Z" fill="${coat}"/>
+    <ellipse cx="-15" cy="81" rx="3" ry="4.5" fill="#694658" stroke="none"/><ellipse cx="15" cy="81" rx="3" ry="4.5" fill="#694658" stroke="none"/>
+    <ellipse cx="-25" cy="91" rx="7" ry="4" fill="#f2a9b9" stroke="none" opacity=".85"/><ellipse cx="25" cy="91" rx="7" ry="4" fill="#f2a9b9" stroke="none" opacity=".85"/>
+    <path d="M-3 88 Q0 85 3 88 L0 91Z" fill="#b77a8e" stroke="none"/><path d="M0 91 Q-4 96 -7 92 M0 91 Q4 96 7 92" fill="none" stroke-width="1.4"/>
+    <path d="M-22 111 Q-31 117 -21 121 M22 111 Q31 117 21 121" fill="none"/>
+  </g>`;
+  return `<svg class="bunny-art" viewBox="0 0 280 158" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <ellipse cx="140" cy="80" rx="108" ry="65" fill="#fff1f1"/>
+    <path d="M15 62l5-9 5 9 9 5-9 5-5 9-5-9-9-5z M242 37l4-8 4 8 8 4-8 4-4 8-4-8-8-4z" fill="#e6bdde"/>
+    <circle cx="45" cy="24" r="4" fill="#f5c1cf"/><circle cx="236" cy="116" r="3.5" fill="#f2c4d0"/>
+    ${romantic ? `${bunny(99,'#fff9ed','#f2c2c8')}${bunny(181,'#f6dce8','#f1b4c7',-1)}<g transform="translate(140 107)" stroke="#c27e9d" stroke-width="1.5"><rect x="-23" y="-12" width="46" height="29" rx="5" fill="#fff9f5"/><path d="M-21 -9L0 5 21 -9" fill="none"/><path d="M0 1C-10-8-13 1 0 11 13 1 10-8 0 1Z" fill="#d77c9a" stroke="none"/></g><path class="floating-heart" d="M140 27C128 10 113 25 140 45 167 25 152 10 140 27Z" fill="#dd8eab"/>` : `${bunny(140,'#fff9ee','#f2c0c8')}<g transform="translate(140 111) rotate(-5)" stroke="#b78098" stroke-width="1.4"><rect x="-21" y="-15" width="42" height="34" rx="5" fill="#eac9e3"/><rect x="-16" y="-10" width="32" height="25" rx="2" fill="#fffaf5" stroke="none"/><rect x="-7" y="-18" width="14" height="6" rx="3" fill="#f7c8d5"/><path d="M-10-3l3 3 4-6M1-3h9M-10 7l3 3 4-6M1 7h9" fill="none"/></g><g transform="translate(178 45)"><path d="M0 0 C-17-14-22 5-3 7 C-5 22 11 20 7 6 C24 8 21-10 5-3 C11-20-7-20 0 0Z" fill="#f4aec4"/><circle cx="3" cy="3" r="4" fill="#fff0b8"/></g>`}
+  </svg>`;
+}
+
 function render(html, breadcrumb, stage) {
   panel.innerHTML = html;
   panel.dataset.stage = stage;
   panel.dataset.screen = panel.querySelector('#candidate-name') ? 'intro' : panel.querySelector('[data-choice]') ? 'question' : panel.querySelector('.score') ? 'report' : panel.querySelector('#accept, #yes') ? 'invitation' : panel.querySelector('[data-idea]') ? 'ideas' : panel.querySelector('#meeting-day') ? 'date' : panel.querySelector('.celebration') ? 'celebration' : panel.querySelector('.history-list') ? 'history' : 'other';
+  if (['intro', 'invitation', 'celebration'].includes(panel.dataset.screen)) {
+    const art = document.createElement('div');
+    art.className = 'storybook-art';
+    art.innerHTML = bunnyArt(panel.dataset.screen);
+    panel.querySelector('h1').before(art);
+  }
   if (panel.dataset.screen === 'invitation') {
     const ornament = document.createElement('div');
     ornament.className = 'love-letter';
@@ -94,6 +123,14 @@ function render(html, breadcrumb, stage) {
     sparkle.setAttribute('aria-hidden', 'true');
     sparkle.innerHTML = '<span>✦</span><span>♡</span><span>✧</span><span>♡</span><span>✦</span>';
     panel.prepend(sparkle);
+  }
+  if (panel.dataset.screen === 'question') {
+    const progress = panel.querySelector('.progress');
+    const steps = document.createElement('div');
+    steps.className = 'petal-progress';
+    steps.setAttribute('aria-hidden', 'true');
+    steps.innerHTML = Array.from({length: 7}, (_, i) => `<span class="${i < index ? 'bloomed' : i === index ? 'blooming' : ''}">✿</span>`).join('');
+    progress.after(steps);
   }
   document.querySelector('#breadcrumb').textContent = breadcrumb;
   for (let step = 1; step <= 3; step++) {
