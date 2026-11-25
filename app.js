@@ -323,8 +323,12 @@ function showDateSummary(idea, date) {
 function finish() {
   attempt.status = 'declined';
   saveAttempt();
-  render(`<div class="eyebrow">PROCESSO ENCERRADO</div><div class="end-mark neutral" aria-hidden="true">–</div><h1>Avaliação encerrada</h1><p>Obrigado por participar da avaliação.</p>${historyActions()}`, 'Avaliação / Conclusão', 3);
-  bindHistoryActions();
+  render(`<div class="eyebrow">PROCESSO ENCERRADO</div><div class="end-mark neutral" aria-hidden="true">–</div><h1>Avaliação encerrada</h1><div class="closure-message"><p><span id="closure-name"></span>, você é exatamente o tipo de garota que eu gosto, e não quero continuar me aproximando de alguém por quem posso desenvolver sentimentos sem que exista interesse recíproco.</p><p>Por isso, a partir de hoje, prefiro que nosso contato seja exclusivamente profissional. Não quero manter uma relação de amizade com você.</p><p>Obrigado por participar da avaliação.</p></div><button class="primary" id="close-assessment">Encerrar avaliação</button>`, 'Avaliação / Conclusão', 3);
+  document.getElementById('closure-name').textContent = candidate;
+  bind('close-assessment', () => {
+    render(`<div class="eyebrow">PROCESSO ENCERRADO</div><div class="end-mark neutral" aria-hidden="true">–</div><h1>Avaliação encerrada</h1><p>Obrigado por participar da avaliação. Você pode fechar esta página.</p>`, 'Avaliação / Conclusão', 3);
+    attempt = null;
+  });
 }
 
 intro();

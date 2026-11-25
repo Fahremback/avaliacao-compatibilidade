@@ -63,6 +63,10 @@ body { background-color:#fff1f5; background-image:radial-gradient(circle at 20% 
 .panel[data-screen='invitation'] .reveal h2 { text-align:center; }
 .panel[data-screen='invitation'] .reveal p { text-align:center; }
 .history-entry { background:#fff7fa; }
+.closure-message { padding:17px; background:#fff7fa; border:1px solid #efd7e1; border-radius:17px; margin:20px 0; overflow-wrap:anywhere; }
+.closure-message p { margin:0 0 16px; }
+.closure-message p:last-child { margin-bottom:0; }
+#close-assessment { width:100%; }
 @media(max-width:740px){
   .workspace{padding-top:20px;}
   .panel{border-radius:24px;padding:20px 17px;}
