@@ -93,19 +93,77 @@ function report() {
 function invite() {
   render(`<div class="eyebrow">ETAPA 2 — CONVITE EXCLUSIVO</div><h1>Convite autorizado</h1><p>Com base no resultado da primeira etapa, o sistema concedeu acesso a uma oportunidade exclusiva.</p>
     <div class="reveal"><h2>Você aceita sair comigo?</h2><p>Um encontro a dois, com dia e horário a combinar.</p><div class="actions"><button class="primary" id="accept">Aceitar</button><button class="secondary" id="decline">Recusar</button><button class="subtle" id="clarify">Esclarecer a natureza do convite</button></div></div>`, 'Avaliação / Convite exclusivo', 3);
-  bind('accept', () => finish(true));
+  bind('accept', chooseDateIdea);
   bind('decline', () => finish(false));
   bind('clarify', clarify);
 }
 
 function clarify() {
   render(`<div class="eyebrow">ETAPA 2 — ESCLARECIMENTO</div><h1>Natureza do convite</h1><p>Sim, é um convite para um encontro romântico. A avaliação anterior foi uma brincadeira.</p><div class="reveal"><h2>Você quer sair comigo?</h2><div class="actions"><button class="primary" id="yes">Sim</button><button class="secondary" id="no">Não</button></div></div>`, 'Avaliação / Esclarecimento', 3);
-  bind('yes', () => finish(true));
+  bind('yes', chooseDateIdea);
   bind('no', () => finish(false));
 }
 
-function finish(accepted) {
-  render(`<div class="eyebrow">PROCESSO ENCERRADO</div><div class="end-mark ${accepted ? '' : 'neutral'}" aria-hidden="true">${accepted ? '✓' : '–'}</div><h1>${accepted ? 'Encontro confirmado!' : 'Avaliação encerrada'}</h1><p>${accepted ? 'Parabéns. Você concluiu todas as etapas. Agora só falta combinarmos o dia e o horário.' : 'Resposta registrada nesta sessão. Obrigado por participar da avaliação.'}</p>`, 'Avaliação / Conclusão', 3);
+const dateIdeas = [
+  ['🍣', 'Sushi', 'Um jantar gostoso e muita conversa.'],
+  ['🍿', 'Filme em casa', 'Conforto, filme e pipoca.'],
+  ['🎬', 'Cinema', 'Uma sessão de cinema a dois.'],
+  ['🏎️', 'Andar de kart', 'Um pouco de adrenalina.'],
+  ['✨', 'Todos, porque quero viver muito!', 'Por que escolher só um?'],
+];
+
+function chooseDateIdea() {
+  let idea = -1;
+  render(`<div class="eyebrow">ETAPA 2 — NOSSO PRIMEIRO ENCONTRO</div><h1>Qual seria o seu primeiro encontro ideal?</h1><p>Escolha o programa que mais combina com você.</p><div class="options date-ideas">${dateIdeas.map(([icon, label, detail], i) => `<button class="option idea-option" data-idea="${i}" aria-pressed="false"><span class="idea-icon" aria-hidden="true">${icon}</span><span class="idea-text"><strong>${label}</strong><small>${detail}</small></span></button>`).join('')}</div><div class="question-actions"><span class="hint">Escolha uma opção.</span><button class="primary" id="idea-next" disabled>Continuar <span class="arrow" aria-hidden="true">→</span></button></div>`, 'Avaliação / Primeiro encontro', 3);
+  panel.querySelectorAll('[data-idea]').forEach(button => button.addEventListener('click', () => {
+    idea = Number(button.dataset.idea);
+    panel.querySelectorAll('[data-idea]').forEach(choice => {
+      const active = choice === button;
+      choice.classList.toggle('selected', active);
+      choice.setAttribute('aria-pressed', String(active));
+    });
+    document.getElementById('idea-next').disabled = false;
+  }));
+  bind('idea-next', () => { if (idea >= 0) chooseDay(idea); });
+}
+
+function chooseDay(idea) {
+  const today = new Date();
+  const minimum = [today.getFullYear(), String(today.getMonth() + 1).padStart(2, '0'), String(today.getDate()).padStart(2, '0')].join('-');
+  render(`<div class="eyebrow">ETAPA 2 — RESERVE UM DIA</div><h1>E qual dia funciona para você?</h1><p>Escolha uma data para nosso primeiro encontro.</p><div class="chosen-idea"><span aria-hidden="true">${dateIdeas[idea][0]}</span><strong>${dateIdeas[idea][1]}</strong></div><form id="date-form"><label for="meeting-day">Data do encontro</label><input class="date-input" type="date" id="meeting-day" name="meeting-day" min="${minimum}" required><div class="question-actions"><button class="subtle" type="button" id="change-idea">Mudar programa</button><button class="primary" type="submit">Confirmar <span class="arrow" aria-hidden="true">→</span></button></div></form>`, 'Avaliação / Data do encontro', 3);
+  bind('change-idea', chooseDateIdea);
+  document.getElementById('date-form').addEventListener('submit', event => {
+    event.preventDefault();
+    const input = document.getElementById('meeting-day');
+    if (input.checkValidity() && input.value >= minimum) showDateSummary(idea, input.value);
+  });
+}
+
+function showDateSummary(idea, date) {
+  const [year, month, day] = date.split('-').map(Number);
+  const formatted = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'full' }).format(new Date(year, month - 1, day));
+  const label = dateIdeas[idea][1];
+  render(`<div class="eyebrow">PROCESSO CONCLUÍDO</div><div class="end-mark celebration" aria-hidden="true">♡</div><h1>Temos um encontro!</h1><p>Seu programa e dia estão escolhidos. Agora só falta combinar o horário.</p><dl class="date-summary"><div><dt>Primeiro encontro</dt><dd>${dateIdeas[idea][0]} ${label}</dd></div><div><dt>Dia escolhido</dt><dd>${formatted}</dd></div></dl><p class="share-note">Copie o resumo para enviar a quem te convidou.</p><div class="actions"><button class="primary" id="copy-plan">Copiar nosso plano</button><button class="secondary" id="edit-day">Alterar data</button></div><p id="copy-status" class="copy-status" role="status"></p>`, 'Avaliação / Conclusão', 3);
+  bind('edit-day', () => chooseDay(idea));
+  bind('copy-plan', async () => {
+    const message = `Aceito sair com você!\nPrograma: ${label}\nDia: ${formatted}`;
+    const status = document.getElementById('copy-status');
+    try {
+      await navigator.clipboard.writeText(message);
+      status.textContent = 'Copiado! Agora é só enviar.';
+    } catch {
+      const field = document.createElement('textarea');
+      field.value = message;
+      field.readOnly = true;
+      field.className = 'copy-fallback';
+      status.replaceChildren(field);
+      field.select();
+    }
+  });
+}
+
+function finish() {
+  render(`<div class="eyebrow">PROCESSO ENCERRADO</div><div class="end-mark neutral" aria-hidden="true">–</div><h1>Avaliação encerrada</h1><p>Resposta registrada nesta sessão. Obrigado por participar da avaliação.</p>`, 'Avaliação / Conclusão', 3);
 }
 
 intro();
