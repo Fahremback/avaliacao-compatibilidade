@@ -82,3 +82,11 @@ body { background-color:#fff1f5; background-image:radial-gradient(circle at 20% 
   .option{min-height:60px;}
 }
 @media(prefers-reduced-motion:reduce){.bunny-art,.floating-heart,.storybook-art,.petal-progress .blooming{animation:none!important;}}
+
+/* On the refusal screen, the actual message takes precedence over the status. */
+#panel .closure-result h1 { font-family:inherit; font-size:15px; font-weight:600; letter-spacing:0; line-height:1.4; color:#795c6e; margin:8px 0 16px; }
+#panel .closure-message { padding:clamp(17px,3.8vw,28px); background:#fff2f6; border:1.5px solid #e4b6cb; border-radius:18px; margin:0 0 20px; }
+#panel .closure-message p { font-family:inherit; font-size:clamp(18px,4.6vw,23px); line-height:1.6; font-weight:500; color:#503043; letter-spacing:0; margin:0 0 20px; }
+#panel .closure-message p strong { font-weight:750; color:#50263d; }
+#panel .closure-message p:last-child { margin-bottom:0; }
+#panel #close-assessment { font-size:15px; }
