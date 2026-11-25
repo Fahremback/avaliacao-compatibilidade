@@ -226,7 +226,7 @@ function report() {
     <div class="result-top"><div><span class="result-caption">RESULTADO DA PRIMEIRA ETAPA</span><div class="score">96<small>/100</small></div></div><span class="status">APROVADA</span></div>
     <div class="metrics">${metrics.map(([label, value]) => `<div><div class="metric-head"><span>${label}</span><span>${value}%</span></div><div class="metric-track" role="meter" aria-label="${label}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${value}"><span class="${value < 20 ? 'low' : ''}" style="width:${value}%"></span></div></div>`).join('')}</div>
     <div class="approval"><strong>Parabéns, você foi aprovada!</strong><p>Apesar das irregularidades encontradas, seu desempenho foi considerado satisfatório. Você está habilitada a participar da segunda etapa.</p></div>
-    <button class="primary" id="proceed">Prosseguir <span class="arrow" aria-hidden="true">→</span></button>`, 'Avaliação / Relatório', 2);
+    <button class="primary" id="proceed">Ir para a segunda etapa <span class="arrow" aria-hidden="true">→</span></button>`, 'Avaliação / Relatório', 2);
   document.getElementById('candidate').textContent = candidate;
   bind('proceed', invite);
 }

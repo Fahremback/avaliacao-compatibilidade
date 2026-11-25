@@ -90,3 +90,9 @@ body { background-color:#fff1f5; background-image:radial-gradient(circle at 20% 
 #panel .closure-message p strong { font-weight:750; color:#50263d; }
 #panel .closure-message p:last-child { margin-bottom:0; }
 #panel #close-assessment { font-size:15px; }
+
+/* Clear next-step action on the first-stage report. */
+#panel #proceed { width:100%; min-height:68px; margin-top:16px; padding:16px 20px; font-size:clamp(17px,4.8vw,21px); font-weight:750; color:#fff; background:linear-gradient(120deg,#a23c70,#78438e); border:1px solid #81335e; border-radius:20px; box-shadow:0 5px 0 #723456,0 10px 24px #a23c7033; }
+#panel #proceed .arrow { font-size:1.3em; margin-left:8px; }
+#panel #proceed:focus-visible { outline:3px solid #723456; outline-offset:4px; }
+#panel #proceed:active { transform:translateY(2px); box-shadow:0 3px 0 #723456; }
