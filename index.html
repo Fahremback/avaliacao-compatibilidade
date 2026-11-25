@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#101d30">
+  <title>Sistema de Avaliação de Compatibilidade</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span><div><strong>SAC</strong><small>Sistema de Avaliação de Compatibilidade</small></div></div>
+    <span class="online"><i></i> Sistema operacional</span>
+  </header>
+  <main class="layout">
+    <aside class="sidebar" aria-label="Etapas da avaliação">
+      <div class="side-caption">PROCESSO DE AVALIAÇÃO</div>
+      <ol class="steps">
+        <li id="step1" class="active"><span class="step-number">01</span><div><strong>Avaliação comportamental</strong><small>Questionário individual</small></div></li>
+        <li id="step2"><span class="step-number">02</span><div><strong>Relatório de desempenho</strong><small>Análise de compatibilidade</small></div></li>
+        <li id="step3"><span class="step-number">03</span><div><strong>Segunda etapa</strong><small>Acesso condicionado</small></div></li>
+      </ol>
+      <div class="side-bottom"><span>PROTOCOLO</span><strong>SAC-02 / v1.0</strong><small>Processamento local · Sessão individual</small></div>
+    </aside>
+    <section class="workspace">
+      <div class="workspace-header"><span id="breadcrumb">Avaliação / Início</span><span class="session">SESSÃO ATIVA</span></div>
+      <div class="mobile-steps" aria-hidden="true"><span id="mobile1" class="current"></span><span id="mobile2"></span><span id="mobile3"></span></div>
+      <article id="panel" class="panel" aria-live="polite"></article>
+      <footer class="foot"><span>SAC · Avaliação individual</span><span>Nenhuma resposta é transmitida.</span></footer>
+    </section>
+  </main>
+</body>
+</html>
