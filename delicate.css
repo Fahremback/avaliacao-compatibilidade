@@ -24,6 +24,9 @@ body {
 .panel h1,.panel h2 { color: var(--ink); text-wrap: balance; overflow-wrap: anywhere; line-height: 1.12; font-family: Georgia,'Times New Roman',serif; }
 .panel h1 { font-size: clamp(31px, 5vw, 46px); }
 .panel h2 { font-size: clamp(27px, 4.6vw, 37px); }
+/* Headings receive programmatic focus for screen readers, not keyboard interaction. */
+#panel h1[tabindex='-1']:focus,
+#panel h2[tabindex='-1']:focus { outline: none; }
 .panel p { color: var(--muted); line-height: 1.55; }
 .eyebrow { font-size: 10px; letter-spacing: .10em; color: #975b81; }
 .eyebrow::before { content: '✧'; color: #b56e9a; margin-right: 5px; }
