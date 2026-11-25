@@ -79,6 +79,22 @@ function showHistory() {
 
 function render(html, breadcrumb, stage) {
   panel.innerHTML = html;
+  panel.dataset.stage = stage;
+  panel.dataset.screen = panel.querySelector('#candidate-name') ? 'intro' : panel.querySelector('[data-choice]') ? 'question' : panel.querySelector('.score') ? 'report' : panel.querySelector('#accept, #yes') ? 'invitation' : panel.querySelector('[data-idea]') ? 'ideas' : panel.querySelector('#meeting-day') ? 'date' : panel.querySelector('.celebration') ? 'celebration' : panel.querySelector('.history-list') ? 'history' : 'other';
+  if (panel.dataset.screen === 'invitation') {
+    const ornament = document.createElement('div');
+    ornament.className = 'love-letter';
+    ornament.setAttribute('aria-hidden', 'true');
+    ornament.innerHTML = '<span class="letter-spark">✦</span><span class="envelope"><i>♡</i></span><span class="letter-spark">✧</span>';
+    panel.querySelector('h1').before(ornament);
+  }
+  if (panel.dataset.screen === 'celebration') {
+    const sparkle = document.createElement('div');
+    sparkle.className = 'celebration-sparkles';
+    sparkle.setAttribute('aria-hidden', 'true');
+    sparkle.innerHTML = '<span>✦</span><span>♡</span><span>✧</span><span>♡</span><span>✦</span>';
+    panel.prepend(sparkle);
+  }
   document.querySelector('#breadcrumb').textContent = breadcrumb;
   for (let step = 1; step <= 3; step++) {
     const state = step < stage ? 'done' : step === stage ? 'active' : '';
@@ -145,6 +161,9 @@ function question() {
     const feedback = document.getElementById('feedback');
     feedback.textContent = options[selected][1];
     feedback.hidden = false;
+    feedback.classList.remove('feedback-pop');
+    void feedback.offsetWidth;
+    feedback.classList.add('feedback-pop');
     document.getElementById('next').disabled = false;
   }));
   bind('next', () => {
@@ -242,6 +261,10 @@ function showDateSummary(idea, date) {
   saveAttempt();
   render(`<div class="eyebrow">PROCESSO CONCLUÍDO</div><div class="end-mark celebration" aria-hidden="true">♡</div><h1>Temos um encontro!</h1><p>Seu programa e dia estão escolhidos. Agora só falta combinar o horário.</p><dl class="date-summary"><div><dt>Primeiro encontro</dt><dd>${dateIdeas[idea][0]} ${label}</dd></div><div><dt>Dia escolhido</dt><dd>${formatted}</dd></div></dl><p class="share-note">Copie o resumo para enviar a quem te convidou.</p><div class="actions"><button class="primary" id="copy-plan">Copiar nosso plano</button><button class="secondary" id="edit-day">Alterar data</button></div><p id="copy-status" class="copy-status" role="status"></p>${historyActions()}`, 'Avaliação / Conclusão', 3);
   bindHistoryActions();
+  const note = document.createElement('p');
+  note.className = 'personal-note';
+  note.textContent = `Que seja um dia lindo, ${candidate}!`;
+  panel.querySelector('h1').after(note);
   bind('edit-day', () => chooseDay(idea));
   bind('copy-plan', async () => {
     const message = `Aceito sair com você!\nPrograma: ${label}\nDia: ${formatted}`;
