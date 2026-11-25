@@ -10,9 +10,72 @@ const questions = [
 
 const metrics = [['Personalidade', 98], ['Bom humor', 95], ['Capacidade de ser difícil', 100], ['Estabilidade no WhatsApp', 12], ['Potencial de compatibilidade', 96]];
 const panel = document.querySelector('#panel');
-const candidate = new URLSearchParams(location.hash.slice(1)).get('c')?.trim().slice(0, 50) || 'Candidata';
+const suggestedName = new URLSearchParams(location.hash.slice(1)).get('c')?.trim().slice(0, 50) || '';
+const historyPrefix = 'sac:assessment:v1:';
+let candidate = '';
+let attempt = null;
 let index = 0;
 let selected = -1;
+
+function saveAttempt() {
+  if (!attempt) return;
+  attempt.updatedAt = new Date().toISOString();
+  try {
+    localStorage.setItem(historyPrefix + attempt.id, JSON.stringify(attempt));
+    document.getElementById('storage-status').textContent = 'Histórico salvo neste navegador. Nenhuma resposta é transmitida.';
+  } catch {
+    document.getElementById('storage-status').textContent = 'Não foi possível salvar o histórico neste navegador.';
+  }
+}
+
+function readHistory() {
+  const records = [];
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (!key?.startsWith(historyPrefix)) continue;
+      try {
+        const record = JSON.parse(localStorage.getItem(key));
+        if (record && typeof record.name === 'string' && Array.isArray(record.answers)) records.push(record);
+      } catch { /* Ignore an unreadable entry without affecting other tests. */ }
+    }
+  } catch {
+    document.getElementById('storage-status').textContent = 'Não foi possível acessar o histórico neste navegador.';
+  }
+  return records.sort((a, b) => String(b.startedAt).localeCompare(String(a.startedAt)));
+}
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+}
+
+function formatMeetingDate(date) {
+  const [year, month, day] = date.split('-').map(Number);
+  return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'full' }).format(new Date(year, month - 1, day));
+}
+
+function historyActions() {
+  return '<div class="history-actions"><button class="secondary" id="open-history">Ver histórico local</button><button class="subtle" id="new-test">Fazer outro teste</button></div>';
+}
+
+function bindHistoryActions() {
+  bind('open-history', showHistory);
+  bind('new-test', intro);
+}
+
+function showHistory() {
+  const records = readHistory();
+  const states = { started: 'Em andamento', evaluated: 'Avaliação concluída · Convite sem resposta', accepted: 'Convite aceito · Data a combinar', declined: 'Convite recusado', planned: 'Encontro escolhido' };
+  const cards = records.map(record => {
+    const started = new Date(record.startedAt);
+    const timestamp = Number.isFinite(started.getTime()) ? new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(started) : 'Data indisponível';
+    const answers = record.answers.map(answer => `<li><strong>${escapeHtml(answer.question)}</strong><span>${escapeHtml(answer.answer)}</span><small>${escapeHtml(answer.feedback)}</small></li>`).join('');
+    const day = record.meetingDate && /^\d{4}-\d{2}-\d{2}$/.test(record.meetingDate) ? formatMeetingDate(record.meetingDate) : '';
+    return `<details class="history-entry"><summary><span><strong>${escapeHtml(record.name)}</strong><small>${escapeHtml(timestamp)} · ${record.answers.length}/7 perguntas</small></span><span class="history-score">${record.score === 96 ? '96/100' : 'Em curso'}</span></summary><div class="history-body"><p class="history-state">${escapeHtml(states[record.status] || 'Em andamento')}</p>${record.idea ? `<p><strong>Programa:</strong> ${escapeHtml(record.idea)}</p>` : ''}${day ? `<p><strong>Dia:</strong> ${escapeHtml(day)}</p>` : ''}${answers ? `<ol class="history-answers">${answers}</ol>` : '<p>Nenhuma pergunta respondida ainda.</p>'}</div></details>`;
+  }).join('');
+  render(`<div class="eyebrow">SEUS REGISTROS</div><h1>Histórico de avaliações</h1><p>Testes realizados neste navegador, disponíveis apenas neste dispositivo e perfil de navegador.</p><div class="history-count">${records.length} ${records.length === 1 ? 'teste registrado' : 'testes registrados'}</div><div class="history-list">${cards || '<p class="empty-history">Nenhuma avaliação registrada ainda.</p>'}</div><div class="history-actions"><button class="primary" id="new-test">Voltar ao início</button></div>`, 'Avaliação / Histórico', 1);
+  bind('new-test', intro);
+}
 
 function render(html, breadcrumb, stage) {
   panel.innerHTML = html;
@@ -40,12 +103,28 @@ function bind(id, action) {
 function intro() {
   index = 0;
   selected = -1;
+  attempt = null;
   render(`<div class="eyebrow">PROTOCOLO DE AVALIAÇÃO INDIVIDUAL</div>
     <h1>Sistema de Avaliação de Compatibilidade</h1>
     <p>Este procedimento consiste em uma breve avaliação comportamental. Selecione a resposta que melhor representa seu perfil em cada questão.</p>
     <div class="intro-meta"><div class="meta"><small>Questões</small><strong>07</strong></div><div class="meta"><small>Tempo estimado</small><strong>2 minutos</strong></div></div>
-    <button class="primary" id="start">Iniciar avaliação <span class="arrow" aria-hidden="true">→</span></button>`, 'Avaliação / Início', 1);
-  bind('start', question);
+    <form id="name-form"><label for="candidate-name">Qual é o seu nome?</label><input class="date-input" id="candidate-name" name="name" type="text" autocomplete="given-name" maxlength="50" required placeholder="Digite seu nome"><p class="local-note">Seu nome e suas respostas serão guardados neste navegador, inclusive se você sair antes de terminar.</p><button class="primary" id="start" type="submit">Iniciar avaliação <span class="arrow" aria-hidden="true">→</span></button></form><div class="history-actions"><button class="secondary" id="open-history">Ver histórico local</button></div>`, 'Avaliação / Início', 1);
+  const input = document.getElementById('candidate-name');
+  input.value = candidate || suggestedName;
+  input.addEventListener('input', () => input.setCustomValidity(''));
+  document.getElementById('name-form').addEventListener('submit', event => {
+    event.preventDefault();
+    candidate = input.value.trim();
+    if (!candidate) {
+      input.setCustomValidity('Digite seu nome para continuar.');
+      input.reportValidity();
+      return;
+    }
+    attempt = { id: crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`, name: candidate, startedAt: new Date().toISOString(), answers: [], status: 'started', score: null, idea: null, meetingDate: null };
+    saveAttempt();
+    question();
+  });
+  bind('open-history', showHistory);
 }
 
 function question() {
@@ -70,6 +149,12 @@ function question() {
   }));
   bind('next', () => {
     if (selected < 0) return;
+    attempt.answers.push({ question: prompt, answer: options[selected][0], feedback: options[selected][1] });
+    if (index === questions.length - 1) {
+      attempt.status = 'evaluated';
+      attempt.score = 96;
+    }
+    saveAttempt();
     if (++index < questions.length) question();
     else processing();
   });
@@ -113,6 +198,8 @@ const dateIdeas = [
 ];
 
 function chooseDateIdea() {
+  attempt.status = attempt.meetingDate ? 'planned' : 'accepted';
+  saveAttempt();
   let idea = -1;
   render(`<div class="eyebrow">ETAPA 2 — NOSSO PRIMEIRO ENCONTRO</div><h1>Qual seria o seu primeiro encontro ideal?</h1><p>Escolha o programa que mais combina com você.</p><div class="options date-ideas">${dateIdeas.map(([icon, label, detail], i) => `<button class="option idea-option" data-idea="${i}" aria-pressed="false"><span class="idea-icon" aria-hidden="true">${icon}</span><span class="idea-text"><strong>${label}</strong><small>${detail}</small></span></button>`).join('')}</div><div class="question-actions"><span class="hint">Escolha uma opção.</span><button class="primary" id="idea-next" disabled>Continuar <span class="arrow" aria-hidden="true">→</span></button></div>`, 'Avaliação / Primeiro encontro', 3);
   panel.querySelectorAll('[data-idea]').forEach(button => button.addEventListener('click', () => {
@@ -124,7 +211,14 @@ function chooseDateIdea() {
     });
     document.getElementById('idea-next').disabled = false;
   }));
-  bind('idea-next', () => { if (idea >= 0) chooseDay(idea); });
+  bind('idea-next', () => {
+    if (idea < 0) return;
+    if (attempt.idea !== dateIdeas[idea][1]) attempt.meetingDate = null;
+    attempt.idea = dateIdeas[idea][1];
+    attempt.status = attempt.meetingDate ? 'planned' : 'accepted';
+    saveAttempt();
+    chooseDay(idea);
+  });
 }
 
 function chooseDay(idea) {
@@ -140,10 +234,14 @@ function chooseDay(idea) {
 }
 
 function showDateSummary(idea, date) {
-  const [year, month, day] = date.split('-').map(Number);
-  const formatted = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'full' }).format(new Date(year, month - 1, day));
+  const formatted = formatMeetingDate(date);
   const label = dateIdeas[idea][1];
-  render(`<div class="eyebrow">PROCESSO CONCLUÍDO</div><div class="end-mark celebration" aria-hidden="true">♡</div><h1>Temos um encontro!</h1><p>Seu programa e dia estão escolhidos. Agora só falta combinar o horário.</p><dl class="date-summary"><div><dt>Primeiro encontro</dt><dd>${dateIdeas[idea][0]} ${label}</dd></div><div><dt>Dia escolhido</dt><dd>${formatted}</dd></div></dl><p class="share-note">Copie o resumo para enviar a quem te convidou.</p><div class="actions"><button class="primary" id="copy-plan">Copiar nosso plano</button><button class="secondary" id="edit-day">Alterar data</button></div><p id="copy-status" class="copy-status" role="status"></p>`, 'Avaliação / Conclusão', 3);
+  attempt.status = 'planned';
+  attempt.idea = label;
+  attempt.meetingDate = date;
+  saveAttempt();
+  render(`<div class="eyebrow">PROCESSO CONCLUÍDO</div><div class="end-mark celebration" aria-hidden="true">♡</div><h1>Temos um encontro!</h1><p>Seu programa e dia estão escolhidos. Agora só falta combinar o horário.</p><dl class="date-summary"><div><dt>Primeiro encontro</dt><dd>${dateIdeas[idea][0]} ${label}</dd></div><div><dt>Dia escolhido</dt><dd>${formatted}</dd></div></dl><p class="share-note">Copie o resumo para enviar a quem te convidou.</p><div class="actions"><button class="primary" id="copy-plan">Copiar nosso plano</button><button class="secondary" id="edit-day">Alterar data</button></div><p id="copy-status" class="copy-status" role="status"></p>${historyActions()}`, 'Avaliação / Conclusão', 3);
+  bindHistoryActions();
   bind('edit-day', () => chooseDay(idea));
   bind('copy-plan', async () => {
     const message = `Aceito sair com você!\nPrograma: ${label}\nDia: ${formatted}`;
@@ -163,7 +261,10 @@ function showDateSummary(idea, date) {
 }
 
 function finish() {
-  render(`<div class="eyebrow">PROCESSO ENCERRADO</div><div class="end-mark neutral" aria-hidden="true">–</div><h1>Avaliação encerrada</h1><p>Resposta registrada nesta sessão. Obrigado por participar da avaliação.</p>`, 'Avaliação / Conclusão', 3);
+  attempt.status = 'declined';
+  saveAttempt();
+  render(`<div class="eyebrow">PROCESSO ENCERRADO</div><div class="end-mark neutral" aria-hidden="true">–</div><h1>Avaliação encerrada</h1><p>Obrigado por participar da avaliação.</p>${historyActions()}`, 'Avaliação / Conclusão', 3);
+  bindHistoryActions();
 }
 
 intro();

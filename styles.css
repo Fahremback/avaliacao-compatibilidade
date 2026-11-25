@@ -76,6 +76,33 @@ button:focus-visible, input:focus-visible { outline: 3px solid #d4a2c9; outline-
 .panel .share-note { font-size: 13px; }
 .panel .copy-status { font-size: 13px; margin-top: 12px; margin-bottom: 0; }
 .copy-fallback { width: 100%; min-height: 90px; font: inherit; padding: 12px; border: 1px solid var(--line); border-radius: 10px; }
+#name-form { display: grid; gap: 10px; }
+#name-form label { font-size: 14px; font-weight: 650; }
+#name-form .primary { justify-self: start; }
+#name-form .local-note { margin: 0 0 5px; font-size: 12px; }
+.history-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 23px; padding-top: 20px; border-top: 1px solid var(--line); }
+.history-count { font-size: 12px; font-weight: 650; color: var(--muted); margin-bottom: 13px; }
+.history-list { display: grid; gap: 12px; }
+.history-entry { border: 1px solid var(--line); background: #fff8fc; border-radius: 16px; overflow: hidden; }
+.history-entry summary { display: flex; align-items: center; gap: 12px; padding: 16px; cursor: pointer; list-style: none; }
+.history-entry summary::-webkit-details-marker { display: none; }
+.history-entry summary::after { content: '+'; color: var(--blue); font-size: 19px; line-height: 1; }
+.history-entry[open] summary::after { content: '−'; }
+.history-entry summary > span:first-child { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.history-entry summary strong, .history-entry summary small { display: block; }
+.history-entry summary small { font-size: 11px; color: var(--muted); margin-top: 5px; }
+.history-score { color: var(--blue); font-size: 13px; font-weight: 650; white-space: nowrap; }
+.history-body { padding: 16px; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
+.history-body p { font-size: 13px; margin-bottom: 10px; }
+.history-body .history-state { font-weight: 650; color: var(--blue); }
+.history-answers { display: grid; gap: 13px; padding-left: 20px; margin: 15px 0 0; }
+.history-answers li { padding: 0 0 10px 2px; border-bottom: 1px solid var(--line); font-size: 13px; }
+.history-answers li:last-child { border: 0; padding-bottom: 0; }
+.history-answers strong, .history-answers span, .history-answers small { display: block; }
+.history-answers span { margin: 5px 0; color: var(--blue); font-weight: 650; }
+.history-answers small { color: var(--muted); font-size: 12px; }
+.empty-history { padding: 20px; background: #fff7fb; border: 1px dashed var(--line); border-radius: 16px; }
+summary:focus-visible { outline: 3px solid #d4a2c9; outline-offset: -4px; border-radius: 16px; }
 @media(max-width:740px) {
   .panel { border-radius: 23px; padding: 27px 20px; }
   .brand-mark { border-radius: 11px; }
